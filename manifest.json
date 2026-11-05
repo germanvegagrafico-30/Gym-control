@@ -1,0 +1,19 @@
+{
+  "name": "Gym Control — Gestión de Gimnasio",
+  "short_name": "Gym Control",
+  "description": "Aplicación mobile-first para control de cuotas, alertas de vencimiento, WhatsApp y progresión de cargas.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07090d",
+  "theme_color": "#0c1017",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%230c1017'/%3E%3Crect x='24' y='24' width='464' height='464' rx='95' fill='none' stroke='%23a3ff12' stroke-width='16' stroke-opacity='0.4'/%3E%3Cg transform='translate(64, 64) scale(16)' fill='none' stroke='%23a3ff12' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 6.5 17.5 17.5'/%3E%3Cpath d='m21 21-1-1'/%3E%3Cpath d='m3 3 1 1'/%3E%3Cpath d='m18 22 4-4'/%3E%3Cpath d='m2 6 4-4'/%3E%3Cpath d='m3 10 7-7'/%3E%3Cpath d='m14 21 7-7'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

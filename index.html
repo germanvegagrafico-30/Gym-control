@@ -1,0 +1,2934 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0c1017" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Gym Control" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%230c1017'/%3E%3Crect x='24' y='24' width='464' height='464' rx='95' fill='none' stroke='%23a3ff12' stroke-width='16' stroke-opacity='0.4'/%3E%3Cg transform='translate(64, 64) scale(16)' fill='none' stroke='%23a3ff12' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 6.5 17.5 17.5'/%3E%3Cpath d='m21 21-1-1'/%3E%3Cpath d='m3 3 1 1'/%3E%3Cpath d='m18 22 4-4'/%3E%3Cpath d='m2 6 4-4'/%3E%3Cpath d='m3 10 7-7'/%3E%3Cpath d='m14 21 7-7'/%3E%3C/g%3E%3C/svg%3E" />
+  <title>Gym Control — Gestión Inteligente de Gimnasio</title>
+  <style>
+    :root {
+      --bg-base: #07090d;
+      --bg-app: #0c1017;
+      --bg-card: #131924;
+      --bg-card-hover: #192130;
+      --bg-elevated: #1c2536;
+      --bg-glass: rgba(19, 25, 36, 0.88);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-neon: rgba(163, 255, 18, 0.35);
+
+      --neon-primary: #a3ff12;
+      --neon-secondary: #00f57a;
+      --neon-glow: rgba(163, 255, 18, 0.22);
+      --neon-soft: rgba(163, 255, 18, 0.12);
+
+      --wpp-green: #25D366;
+      --wpp-dark: #128C7E;
+      --wpp-bg: rgba(37, 211, 102, 0.14);
+      --wpp-border: rgba(37, 211, 102, 0.4);
+
+      --status-ok: #00e676;
+      --status-ok-bg: rgba(0, 230, 118, 0.12);
+      --status-ok-border: rgba(0, 230, 118, 0.35);
+
+      --status-danger: #ff3b5c;
+      --status-danger-bg: rgba(255, 59, 92, 0.14);
+      --status-danger-border: rgba(255, 59, 92, 0.42);
+
+      --status-warn: #ffb300;
+      --status-warn-bg: rgba(255, 179, 0, 0.14);
+      --status-warn-border: rgba(255, 179, 0, 0.42);
+
+      --text-primary: #f3f6fc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --radius-xl: 28px;
+
+      --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.65);
+      --shadow-neon: 0 8px 24px -4px rgba(163, 255, 18, 0.28);
+      --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(163, 255, 18, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 90% 90%, rgba(0, 245, 122, 0.05) 0%, transparent 40%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+      line-height: 1.45;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background-color: var(--bg-app);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.85);
+      border-left: 1px solid var(--border-subtle);
+      border-right: 1px solid var(--border-subtle);
+      padding-bottom: 96px;
+    }
+
+    /* Header */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(12, 16, 23, 0.86);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--neon-primary), var(--neon-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #07090d;
+      box-shadow: var(--shadow-neon);
+      flex-shrink: 0;
+    }
+
+    .brand-text h1 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .brand-text h1 span {
+      color: var(--neon-primary);
+    }
+
+    .brand-subtitle {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .icon-btn:hover {
+      border-color: var(--border-neon);
+      color: var(--neon-primary);
+      background: var(--bg-card-hover);
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 99px;
+      background: var(--status-danger);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(255, 59, 92, 0.7);
+    }
+
+    /* PWA Install Banner */
+    .install-banner {
+      margin: 14px 18px 0;
+      background: linear-gradient(135deg, rgba(163, 255, 18, 0.16) 0%, rgba(19, 25, 36, 0.96) 100%);
+      border: 1px solid var(--border-neon);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .install-banner.hidden {
+      display: none;
+    }
+
+    .install-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .install-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--neon-soft);
+      color: var(--neon-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .install-text h4 {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .install-text p {
+      font-size: 0.73rem;
+      color: var(--text-secondary);
+    }
+
+    .install-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-install {
+      background: linear-gradient(135deg, var(--neon-primary), var(--neon-secondary));
+      color: #07090d;
+      border: none;
+      border-radius: 9px;
+      padding: 8px 12px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(163, 255, 18, 0.25);
+    }
+
+    .btn-dismiss {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      padding: 4px 6px;
+      cursor: pointer;
+    }
+
+    /* Notificación Push Automática Estilo Teléfono (iOS / Android) */
+    .auto-push-notification {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-150%);
+      width: calc(100% - 24px);
+      max-width: 452px;
+      background: rgba(18, 24, 36, 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 59, 92, 0.55);
+      border-radius: 20px;
+      padding: 13px 15px;
+      z-index: 80;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.85), 0 0 24px rgba(255, 59, 92, 0.22);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .auto-push-notification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .push-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .push-app-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--neon-primary);
+    }
+
+    .push-app-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--status-danger);
+      box-shadow: 0 0 8px var(--status-danger);
+    }
+
+    .push-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .push-body {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.38;
+    }
+
+    /* Main Content & Views */
+    .app-content {
+      flex: 1;
+      padding: 18px;
+    }
+
+    .view-section {
+      display: none;
+      animation: fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .section-title {
+      font-size: 1.32rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .section-caption {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* DASHBOARD CARDS */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .kpi-card.highlight {
+      background: linear-gradient(145deg, #151f28 0%, #111823 100%);
+      border-color: var(--border-neon);
+    }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    .kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--neon-soft);
+      color: var(--neon-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kpi-value {
+      font-size: 1.95rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .kpi-value .neon-accent {
+      color: var(--neon-primary);
+    }
+
+    .kpi-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    .trend-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 0.73rem;
+      background: var(--status-ok-bg);
+      color: var(--status-ok);
+    }
+
+    .members-split {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .split-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .split-box.active-box { border-left: 3px solid var(--status-ok); }
+    .split-box.warn-box { border-left: 3px solid var(--status-warn); }
+    .split-box.inactive-box { border-left: 3px solid var(--status-danger); }
+
+    .split-number {
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .split-number.green { color: var(--status-ok); }
+    .split-number.amber { color: var(--status-warn); }
+    .split-number.red { color: var(--status-danger); }
+
+    .split-label {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .ratio-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 59, 92, 0.25);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 14px;
+      display: flex;
+    }
+
+    .ratio-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-primary), var(--status-ok));
+      border-radius: 99px;
+      transition: width 0.5s ease;
+    }
+
+    /* Quick Backup Card on Dashboard */
+    .backup-quick-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .backup-quick-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .backup-quick-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .backup-quick-desc {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    .backup-btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-backup {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .btn-backup.primary {
+      background: var(--neon-soft);
+      border-color: var(--border-neon);
+      color: var(--neon-primary);
+    }
+
+    .btn-backup:hover {
+      transform: translateY(-1px);
+      border-color: var(--neon-primary);
+    }
+
+    /* Upcoming Expirations List */
+    .sub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .sub-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--neon-primary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    .upcoming-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .upcoming-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: var(--transition);
+    }
+
+    .upcoming-left {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      flex-shrink: 0;
+      position: relative;
+      border: 2px solid var(--border-subtle);
+    }
+
+    .avatar.status-al-dia {
+      border-color: var(--status-ok);
+      box-shadow: 0 0 12px rgba(0, 230, 118, 0.2);
+    }
+
+    .avatar.status-por-vencer {
+      border-color: var(--status-warn);
+      box-shadow: 0 0 12px rgba(255, 179, 0, 0.22);
+    }
+
+    .avatar.status-vencido {
+      border-color: var(--status-danger);
+      box-shadow: 0 0 12px rgba(255, 59, 92, 0.25);
+    }
+
+    .upcoming-info h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .upcoming-info p {
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+    }
+
+    .due-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 99px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .due-tag.expired {
+      background: var(--status-danger-bg);
+      color: var(--status-danger);
+      border: 1px solid var(--status-danger-border);
+    }
+
+    .due-tag.soon {
+      background: var(--status-warn-bg);
+      color: var(--status-warn);
+      border: 1px solid var(--status-warn-border);
+    }
+
+    .due-tag.ok {
+      background: var(--status-ok-bg);
+      color: var(--status-ok);
+      border: 1px solid var(--status-ok-border);
+    }
+
+    /* VIEW 2: CONTROL DE CUOTAS */
+    .cuotas-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .btn-config-wpp {
+      background: var(--wpp-bg);
+      border: 1px solid var(--wpp-border);
+      color: var(--wpp-green);
+      padding: 7px 11px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .btn-config-wpp:hover {
+      background: rgba(37, 211, 102, 0.24);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 7px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .filter-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 7px 13px;
+      border-radius: 99px;
+      font-size: 0.77rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .filter-pill.active {
+      background: var(--neon-primary);
+      color: #07090d;
+      border-color: var(--neon-primary);
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(163, 255, 18, 0.25);
+    }
+
+    .clients-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .priority-divider {
+      font-size: 0.73rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      margin: 6px 0 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .priority-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-subtle);
+    }
+
+    .priority-divider.urgent { color: #ff6b84; }
+    .priority-divider.warning { color: var(--status-warn); }
+    .priority-divider.ok { color: var(--status-ok); }
+
+    .client-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 15px 16px;
+      box-shadow: var(--shadow-soft);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .client-card.card-vencido {
+      border-color: rgba(255, 59, 92, 0.3);
+      background: linear-gradient(145deg, rgba(255, 59, 92, 0.05) 0%, var(--bg-card) 100%);
+    }
+
+    .client-card.card-por-vencer {
+      border-color: rgba(255, 179, 0, 0.3);
+      background: linear-gradient(145deg, rgba(255, 179, 0, 0.05) 0%, var(--bg-card) 100%);
+    }
+
+    .client-card.just-updated {
+      animation: neonFlash 0.9s ease;
+    }
+
+    @keyframes neonFlash {
+      0% { border-color: var(--neon-primary); box-shadow: 0 0 25px rgba(163, 255, 18, 0.45); transform: scale(1.01); }
+      100% { border-color: var(--border-subtle); box-shadow: var(--shadow-soft); transform: scale(1); }
+    }
+
+    .client-main {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .client-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .client-details {
+      min-width: 0;
+    }
+
+    .client-name {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .client-plan {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .client-due {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 99px;
+      font-size: 0.73rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+    }
+
+    .status-badge.al-dia {
+      background: var(--status-ok-bg);
+      color: var(--status-ok);
+      border: 1px solid var(--status-ok-border);
+    }
+
+    .status-badge.por-vencer {
+      background: var(--status-warn-bg);
+      color: var(--status-warn);
+      border: 1px solid var(--status-warn-border);
+    }
+
+    .status-badge.vencido {
+      background: var(--status-danger-bg);
+      color: var(--status-danger);
+      border: 1px solid var(--status-danger-border);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .status-badge.al-dia .status-dot {
+      background: var(--status-ok);
+      box-shadow: 0 0 8px var(--status-ok);
+    }
+
+    .status-badge.por-vencer .status-dot {
+      background: var(--status-warn);
+      box-shadow: 0 0 8px var(--status-warn);
+    }
+
+    .status-badge.vencido .status-dot {
+      background: var(--status-danger);
+      box-shadow: 0 0 8px var(--status-danger);
+    }
+
+    .client-actions {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .fee-amount {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .fee-amount strong {
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .action-buttons-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-wpp {
+      background: var(--wpp-bg);
+      color: var(--wpp-green);
+      border: 1px solid var(--wpp-border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .btn-wpp:hover {
+      background: var(--wpp-green);
+      color: #07090d;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-pay {
+      background: linear-gradient(135deg, var(--neon-primary), var(--neon-secondary));
+      color: #07090d;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 0.79rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 15px rgba(163, 255, 18, 0.25);
+      transition: var(--transition);
+    }
+
+    .btn-pay:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(163, 255, 18, 0.4);
+    }
+
+    /* Floating Action Button (FAB) */
+    .fab-btn {
+      position: fixed;
+      bottom: 92px;
+      right: max(20px, calc(50vw - 220px));
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--neon-primary), var(--neon-secondary));
+      color: #07090d;
+      border: none;
+      font-size: 2rem;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(163, 255, 18, 0.42);
+      z-index: 35;
+      transition: var(--transition);
+    }
+
+    .fab-btn.visible {
+      display: flex;
+      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fab-btn:hover {
+      transform: scale(1.07) rotate(90deg);
+      box-shadow: 0 12px 32px rgba(163, 255, 18, 0.6);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* VIEW 3: RUTINAS Y PROGRESIÓN */
+    .overload-banner {
+      background: linear-gradient(145deg, rgba(163, 255, 18, 0.14) 0%, rgba(19, 25, 36, 0.95) 100%);
+      border: 1px solid var(--border-neon);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .overload-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .overload-info h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--neon-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .overload-info p {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .cycle-pill {
+      background: rgba(163, 255, 18, 0.15);
+      border: 1px solid var(--border-neon);
+      color: var(--neon-primary);
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+
+    .btn-overload {
+      width: 100%;
+      background: linear-gradient(135deg, var(--neon-primary) 0%, var(--neon-secondary) 100%);
+      color: #07090d;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: var(--shadow-neon);
+      transition: var(--transition);
+    }
+
+    .exercises-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .exercise-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      transition: var(--transition);
+    }
+
+    .exercise-card:hover {
+      border-color: rgba(163, 255, 18, 0.28);
+      transform: translateY(-2px);
+    }
+
+    .exercise-card.weight-bumped {
+      border-color: var(--neon-primary);
+      box-shadow: 0 0 24px rgba(163, 255, 18, 0.25);
+    }
+
+    .exercise-media {
+      position: relative;
+      height: 155px;
+      width: 100%;
+      overflow: hidden;
+      background: #1a2230;
+    }
+
+    .exercise-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1);
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: brightness(0.88) contrast(1.08);
+    }
+
+    #view-rutinas.active .exercise-media img {
+      animation: routineImageZoom 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes routineImageZoom {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
+    .exercise-card:hover .exercise-media img,
+    .exercise-card:active .exercise-media img,
+    .exercise-card.weight-bumped .exercise-media img {
+      transform: scale(1.06);
+    }
+
+    .exercise-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(19, 25, 36, 0.98) 5%, rgba(19, 25, 36, 0.35) 55%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px 16px;
+    }
+
+    .muscle-tag {
+      align-self: flex-start;
+      background: rgba(7, 9, 13, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: var(--neon-primary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .exercise-title-wrap h4 {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .exercise-body {
+      padding: 14px 16px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .metric-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .metric-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-pill.weight-pill {
+      background: var(--neon-soft);
+      border-color: var(--border-neon);
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .metric-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .metric-pill.weight-pill .metric-val {
+      color: var(--neon-primary);
+    }
+
+    .delta-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--status-ok);
+      background: var(--status-ok-bg);
+      border: 1px solid var(--status-ok-border);
+      padding: 5px 10px;
+      border-radius: 99px;
+    }
+
+    /* MODALES */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 420px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-neon);
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(163, 255, 18, 0.12);
+      animation: slideUpModal 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUpModal {
+      from { transform: translateY(24px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-app);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      border-color: var(--neon-primary);
+      box-shadow: 0 0 0 3px rgba(163, 255, 18, 0.16);
+    }
+
+    textarea.form-control {
+      min-height: 92px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    .tag-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .tag-chip {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--neon-primary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .tag-chip:hover {
+      border-color: var(--neon-primary);
+    }
+
+    .settings-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 18px 0;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--neon-primary), var(--neon-secondary));
+      color: #07090d;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 4px;
+      box-shadow: var(--shadow-neon);
+      transition: var(--transition);
+    }
+
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: rgba(12, 16, 23, 0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-top: 1px solid var(--border-subtle);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 8px 12px 12px;
+      z-index: 40;
+    }
+
+    .nav-item {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 0;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      transition: var(--transition);
+    }
+
+    .nav-item span {
+      font-size: 0.74rem;
+      font-weight: 600;
+    }
+
+    .nav-item.active {
+      color: var(--neon-primary);
+    }
+
+    .nav-item.active svg {
+      transform: translateY(-2px);
+      filter: drop-shadow(0 0 8px rgba(163, 255, 18, 0.55));
+    }
+
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 28px;
+      height: 3px;
+      border-radius: 99px;
+      background: var(--neon-primary);
+      box-shadow: 0 0 10px var(--neon-primary);
+    }
+
+    /* TOAST NOTIFICATION */
+    .toast-container {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 440px;
+      z-index: 60;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: rgba(19, 25, 36, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--neon-primary);
+      color: var(--text-primary);
+      padding: 12px 15px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75), 0 0 20px rgba(163, 255, 18, 0.22);
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--neon-primary);
+      color: #07090d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-14px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- TOP BAR -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6.5 6.5 17.5 17.5"/>
+            <path d="m21 21-1-1"/>
+            <path d="m3 3 1 1"/>
+            <path d="m18 22 4-4"/>
+            <path d="m2 6 4-4"/>
+            <path d="m3 10 7-7"/>
+            <path d="m14 21 7-7"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>GYM <span>CONTROL</span></h1>
+          <div class="brand-subtitle">Gestión Mobile &amp; Alertas</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Botón de Configuración (Mensaje WhatsApp + Copias de Respaldo) -->
+        <button class="icon-btn" onclick="openSettingsModal()" title="Configurar Mensaje WhatsApp y Copias de Respaldo" aria-label="Configuración y Respaldo">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- BANNER DE INSTALACIÓN DIRECTA EN EL TELÉFONO (PWA) -->
+    <div id="installBanner" class="install-banner">
+      <div class="install-info">
+        <div class="install-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+        </div>
+        <div class="install-text">
+          <h4>Instalar App en tu Teléfono</h4>
+          <p>Acceso directo sin conexión y alertas</p>
+        </div>
+      </div>
+      <div class="install-actions">
+        <button class="btn-install" onclick="handleInstallApp()">Instalar</button>
+        <button class="btn-dismiss" onclick="dismissInstallBanner()" aria-label="Cerrar">✕</button>
+      </div>
+    </div>
+
+    <!-- NOTIFICACIÓN PUSH AUTOMÁTICA DE VENCIMIENTOS (APARECE SOLA AL VENCER / ESTAR POR VENCER) -->
+    <div id="autoPushNotification" class="auto-push-notification" onclick="handlePushClick(event)">
+      <div class="push-header">
+        <span class="push-app-brand">
+          <span class="push-app-dot"></span>
+          GYM CONTROL · NOTIFICACIÓN DE CUOTAS
+        </span>
+        <span id="pushTimeLabel">AHORA</span>
+      </div>
+      <div id="pushTitleText" class="push-title"></div>
+      <div id="pushBodyText" class="push-body"></div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="app-content">
+
+      <!-- ==========================================
+           VISTA 1: DASHBOARD (INICIO)
+           ========================================== -->
+      <section id="view-dashboard" class="view-section active">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Resumen General</h2>
+            <p class="section-caption">Métricas operativas y estado de socios en tiempo real</p>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <!-- Card 1: Ingresos del Mes -->
+          <div class="kpi-card highlight">
+            <div class="kpi-top">
+              <span class="kpi-label">Ingresos del Mes</span>
+              <div class="kpi-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-value" id="kpiRevenue">$0</div>
+            <div class="kpi-meta">
+              <span class="trend-badge">+18.4% vs. mes anterior</span>
+              <span>Guardado automático</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Miembros Activos vs Por Vencer vs Vencidos -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Estado de Membresías</span>
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--neon-primary);" id="kpiTotalMembers">0 Socios</span>
+            </div>
+            <div class="members-split">
+              <div class="split-box inactive-box">
+                <span class="split-number red" id="kpiInactiveCount">0</span>
+                <span class="split-label">Vencidos</span>
+              </div>
+              <div class="split-box warn-box">
+                <span class="split-number amber" id="kpiSoonCount">0</span>
+                <span class="split-label">Por vencer</span>
+              </div>
+              <div class="split-box active-box">
+                <span class="split-number green" id="kpiActiveCount">0</span>
+                <span class="split-label">Al día</span>
+              </div>
+            </div>
+            <div class="ratio-bar" title="Proporción de socios al día">
+              <div id="kpiRatioFill" class="ratio-fill" style="width: 70%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Próximos Vencimientos -->
+        <div class="sub-header">
+          <h3 class="sub-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--neon-primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Próximos Vencimientos
+          </h3>
+          <button class="link-btn" onclick="switchView('cuotas')">Ver todos →</button>
+        </div>
+
+        <div id="upcomingList" class="upcoming-list"></div>
+
+        <!-- Tarjeta de Copias de Respaldo en Inicio -->
+        <div class="backup-quick-card">
+          <div class="backup-quick-top">
+            <div>
+              <div class="backup-quick-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--neon-primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                Copias de Respaldo (Seguridad)
+              </div>
+              <p class="backup-quick-desc" id="lastBackupText">
+                Descarga tus datos para no perder nada si formateas o cambias el teléfono.
+              </p>
+            </div>
+          </div>
+          <div class="backup-btn-row">
+            <button class="btn-backup primary" onclick="exportBackupJson()">
+              ⬇ Descargar Respaldo
+            </button>
+            <button class="btn-backup" onclick="document.getElementById('inputRestoreFile').click()">
+              ⬆ Restaurar Copia
+            </button>
+            <input
+              id="inputRestoreFile"
+              type="file"
+              accept=".json,application/json"
+              style="display: none;"
+              onchange="importBackupJson(event)"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VISTA 2: CONTROL DE CUOTAS
+           ========================================== -->
+      <section id="view-cuotas" class="view-section">
+        <div class="cuotas-toolbar">
+          <div>
+            <h2 class="section-title">Control de Cuotas</h2>
+            <p class="section-caption">Gestiona cobros al instante o da de alta nuevos socios</p>
+          </div>
+          <button class="btn-config-wpp" onclick="openWppModal()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            Mensaje WPP
+          </button>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-pill active" data-filter="todos" onclick="setClientFilter('todos')">
+            Todos <span id="countAll">(0)</span>
+          </button>
+          <button class="filter-pill" data-filter="vencido" onclick="setClientFilter('vencido')">
+            Vencidos <span id="countExpired">(0)</span>
+          </button>
+          <button class="filter-pill" data-filter="por-vencer" onclick="setClientFilter('por-vencer')">
+            Por vencer <span id="countSoon">(0)</span>
+          </button>
+          <button class="filter-pill" data-filter="al-dia" onclick="setClientFilter('al-dia')">
+            Al día <span id="countOk">(0)</span>
+          </button>
+        </div>
+
+        <div id="clientsList" class="clients-list"></div>
+      </section>
+
+      <!-- ==========================================
+           VISTA 3: RUTINAS Y PROGRESIÓN
+           ========================================== -->
+      <section id="view-rutinas" class="view-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Rutinas y Progresión</h2>
+            <p class="section-caption">Seguimiento de fuerza y sobrecarga progresiva</p>
+          </div>
+        </div>
+
+        <div class="overload-banner">
+          <div class="overload-top">
+            <div class="overload-info">
+              <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                Sobrecarga Progresiva
+              </h3>
+              <p>Aumenta +2.5 kg en todos los ejercicios básicos</p>
+            </div>
+            <span id="cycleBadge" class="cycle-pill">Día 1</span>
+          </div>
+          <button id="btnSimulateOverload" class="btn-overload" onclick="simulateOverload()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+            Simular +15 Días (Sobrecarga)
+          </button>
+        </div>
+
+        <div id="exercisesList" class="exercises-list"></div>
+      </section>
+
+    </main>
+
+    <!-- BOTÓN FLOTANTE (FAB) EN VISTA DE CUOTAS -->
+    <button id="fabNewMember" class="fab-btn" onclick="openNewMemberModal()" title="Nuevo Socio" aria-label="Agregar Nuevo Socio">
+      +
+    </button>
+
+    <!-- MODAL 1: NUEVO SOCIO -->
+    <div id="modalNewMember" class="modal-backdrop" onclick="handleBackdropClick(event, 'modalNewMember')">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+          <h3 id="modalTitle">
+            <span style="color: var(--neon-primary);">+</span> Nuevo Socio
+          </h3>
+          <button class="modal-close" type="button" onclick="closeNewMemberModal()" aria-label="Cerrar">✕</button>
+        </div>
+        <form id="formNewMember" onsubmit="handleSaveNewMember(event)">
+          <div class="form-group">
+            <label class="form-label" for="inputMemberName">Nombre completo</label>
+            <input
+              id="inputMemberName"
+              type="text"
+              class="form-control"
+              placeholder="Ej. Lucas Fernández"
+              required
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputMemberPhone">WhatsApp / Teléfono (para aviso con 1 clic)</label>
+            <input
+              id="inputMemberPhone"
+              type="tel"
+              class="form-control"
+              placeholder="Ej. 5491155551234"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputMemberPlan">Plan</label>
+            <select id="inputMemberPlan" class="form-control" required>
+              <option value="Plan Musculación Full">Plan Musculación Full ($32.000)</option>
+              <option value="Pase Libre + Cross">Pase Libre + Cross ($38.000)</option>
+              <option value="Plan Funcional 3x">Plan Funcional 3x ($28.000)</option>
+              <option value="Plan Pro Atleta">Plan Pro Atleta ($45.000)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputMemberDueDate">Fecha del primer vencimiento</label>
+            <input
+              id="inputMemberDueDate"
+              type="date"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn-submit">Guardar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 2: EDITAR MENSAJE AUTOMÁTICO DE WHATSAPP -->
+    <div id="modalWppTemplate" class="modal-backdrop" onclick="handleBackdropClick(event, 'modalWppTemplate')">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="wppModalTitle">
+        <div class="modal-header">
+          <h3 id="wppModalTitle">
+            💬 Mensaje Automático de WhatsApp
+          </h3>
+          <button class="modal-close" type="button" onclick="closeWppModal()" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inputWppTemplate" style="color: var(--wpp-green);">
+            Plantilla de mensaje para clientes vencidos o por vencer
+          </label>
+          <textarea
+            id="inputWppTemplate"
+            class="form-control"
+            placeholder="Escribe el mensaje automático..."
+          ></textarea>
+          <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 6px;">
+            Toca una etiqueta para insertarla automáticamente en el mensaje:
+          </div>
+          <div class="tag-chips">
+            <button type="button" class="tag-chip" onclick="insertTemplateTag('{nombre}')">{nombre}</button>
+            <button type="button" class="tag-chip" onclick="insertTemplateTag('{plan}')">{plan}</button>
+            <button type="button" class="tag-chip" onclick="insertTemplateTag('{vencimiento}')">{vencimiento}</button>
+            <button type="button" class="tag-chip" onclick="insertTemplateTag('{monto}')">{monto}</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn-submit" onclick="saveWppTemplate()">
+          Guardar Mensaje
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 3: CONFIGURACIÓN (COPIAS DE RESPALDO E INSTALACIÓN EN EL TELÉFONO) -->
+    <div id="modalSettings" class="modal-backdrop" onclick="handleBackdropClick(event, 'modalSettings')">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+        <div class="modal-header">
+          <h3 id="settingsModalTitle">
+            ⚙️ Configuración
+          </h3>
+          <button class="modal-close" type="button" onclick="closeSettingsModal()" aria-label="Cerrar">✕</button>
+        </div>
+
+        <!-- 1. Copias de Respaldo (Descargar / Restaurar) -->
+        <div class="form-group" style="margin-bottom: 8px;">
+          <label class="form-label" style="color: var(--neon-primary);">
+            💾 Copias de Respaldo (Anti-Formateo)
+          </label>
+          <p style="font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 10px;">
+            Guarda un archivo de respaldo en tu teléfono o nube (Google Drive / WhatsApp) para restaurar todos tus clientes cuando quieras.
+          </p>
+          <div class="backup-btn-row">
+            <button type="button" class="btn-backup primary" onclick="exportBackupJson()">
+              ⬇ Descargar Copia (.json)
+            </button>
+            <button type="button" class="btn-backup" onclick="document.getElementById('inputRestoreFile').click()">
+              ⬆ Subir Respaldo
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- 2. Instalación en el Teléfono -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">📱 Aplicación en el Teléfono</label>
+          <button type="button" class="btn-backup" style="width: 100%;" onclick="handleInstallApp(true)">
+            📲 Instalar App en Pantalla de Inicio
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <nav class="bottom-nav" aria-label="Navegación Principal">
+      <button class="nav-item active" data-target="dashboard" onclick="switchView('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+          <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+          <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+          <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+        </svg>
+        <span>Dashboard</span>
+      </button>
+
+      <button class="nav-item" data-target="cuotas" onclick="switchView('cuotas')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span>Cuotas</span>
+      </button>
+
+      <button class="nav-item" data-target="rutinas" onclick="switchView('rutinas')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+          <line x1="6" y1="1" x2="6" y2="4"></line>
+          <line x1="10" y1="1" x2="10" y2="4"></line>
+          <line x1="14" y1="1" x2="14" y2="4"></line>
+        </svg>
+        <span>Rutinas</span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    // ====================================================
+    // UTILIDADES DE FECHAS Y FORMATO
+    // ====================================================
+    const STORAGE_KEY = 'gym_control_state_v2';
+    const SOON_THRESHOLD_DAYS = 5; // Consideramos "Por vencer" dentro de los próximos 5 días
+
+    function getRelativeDateISO(offsetDays) {
+      const date = new Date();
+      date.setHours(12, 0, 0, 0);
+      date.setDate(date.getDate() + offsetDays);
+      return date.toISOString().split('T')[0];
+    }
+
+    function addDaysToISO(isoString, daysToAdd) {
+      const parts = isoString.split('-').map(Number);
+      const baseDate = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+      baseDate.setDate(baseDate.getDate() + daysToAdd);
+      const yyyy = baseDate.getFullYear();
+      const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(baseDate.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function formatDisplayDate(isoString) {
+      const [yyyy, mm, dd] = isoString.split('-');
+      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      return `${dd} ${months[parseInt(mm, 10) - 1]} ${yyyy}`;
+    }
+
+    function getDaysDifference(isoString) {
+      const [yyyy, mm, dd] = isoString.split('-').map(Number);
+      const target = new Date(yyyy, mm - 1, dd, 12, 0, 0);
+      const today = new Date();
+      today.setHours(12, 0, 0, 0);
+      return Math.round((target - today) / (1000 * 60 * 60 * 24));
+    }
+
+    // Determina la categoría real e inmediata de un socio: 'vencido', 'por-vencer' o 'al-dia'
+    function getClientUrgencyState(client) {
+      const diff = getDaysDifference(client.dueDate);
+      if (client.status === 'vencido' || diff < 0) {
+        return 'vencido';
+      }
+      if (diff <= SOON_THRESHOLD_DAYS) {
+        return 'por-vencer';
+      }
+      return 'al-dia';
+    }
+
+    // Orden de prioridad numérico: 0 = Vencido, 1 = Por vencer, 2 = Al día
+    function getPriorityRank(client) {
+      const urgency = getClientUrgencyState(client);
+      if (urgency === 'vencido') return 0;
+      if (urgency === 'por-vencer') return 1;
+      return 2;
+    }
+
+    function getInitials(name) {
+      return name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(part => part[0].toUpperCase())
+        .join('');
+    }
+
+    function formatCurrency(amount) {
+      return '$' + amount.toLocaleString('es-AR');
+    }
+
+    // ====================================================
+    // ESTADO GLOBAL Y PERSISTENCIA (LOCALSTORAGE + BACKUP)
+    // ====================================================
+    const PLAN_PRICES = {
+      'Plan Musculación Full': 32000,
+      'Pase Libre + Cross': 38000,
+      'Plan Funcional 3x': 28000,
+      'Plan Pro Atleta': 45000
+    };
+
+    const DEFAULT_WPP_TEMPLATE =
+      '¡Hola {nombre}! 👋 Te escribimos de *Gym Control* para avisarte que tu cuota del *{plan}* ({monto}) venció el *{vencimiento}*. Podés abonar en recepción o por transferencia para mantener tu membresía activa. ¡Te esperamos para entrenar! 💪';
+
+    const defaultState = {
+      currentView: 'dashboard',
+      clientFilter: 'todos',
+      baseMonthlyRevenue: 1420000,
+      simulatedDays: 0,
+      whatsappTemplate: DEFAULT_WPP_TEMPLATE,
+      lastBackupDate: null,
+      clients: [
+        {
+          id: 1,
+          name: 'Valentina Torres',
+          phone: '5491155011122',
+          plan: 'Pase Libre + Cross',
+          fee: 38000,
+          dueDate: getRelativeDateISO(-4),
+          status: 'vencido'
+        },
+        {
+          id: 2,
+          name: 'Matías Rodríguez',
+          phone: '5491155023344',
+          plan: 'Plan Musculación Full',
+          fee: 32000,
+          dueDate: getRelativeDateISO(2),
+          status: 'al-dia'
+        },
+        {
+          id: 3,
+          name: 'Santiago Gómez',
+          phone: '5491155035566',
+          plan: 'Plan Pro Atleta',
+          fee: 45000,
+          dueDate: getRelativeDateISO(-2),
+          status: 'vencido'
+        },
+        {
+          id: 4,
+          name: 'Camila Herrera',
+          phone: '5491155047788',
+          plan: 'Plan Funcional 3x',
+          fee: 28000,
+          dueDate: getRelativeDateISO(4),
+          status: 'al-dia'
+        },
+        {
+          id: 5,
+          name: 'Nicolás Benítez',
+          phone: '5491155059900',
+          plan: 'Plan Musculación Full',
+          fee: 32000,
+          dueDate: getRelativeDateISO(-7),
+          status: 'vencido'
+        },
+        {
+          id: 6,
+          name: 'Julieta Morales',
+          phone: '5491155061234',
+          plan: 'Pase Libre + Cross',
+          fee: 38000,
+          dueDate: getRelativeDateISO(18),
+          status: 'al-dia'
+        },
+        {
+          id: 7,
+          name: 'Facundo Peralta',
+          phone: '5491155075678',
+          plan: 'Plan Pro Atleta',
+          fee: 45000,
+          dueDate: getRelativeDateISO(24),
+          status: 'al-dia'
+        }
+      ],
+      exercises: [
+        {
+          id: 'bench',
+          name: 'Press de Banca Plano',
+          muscle: 'Pectoral · Fuerza Base',
+          weight: 60,
+          initialWeight: 60,
+          setsReps: '4x10',
+          imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80'
+        },
+        {
+          id: 'squat',
+          name: 'Sentadillas con Barra',
+          muscle: 'Cuádriceps & Glúteos',
+          weight: 85,
+          initialWeight: 85,
+          setsReps: '4x8',
+          imageUrl: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=900&q=80'
+        },
+        {
+          id: 'deadlift',
+          name: 'Peso Muerto Convencional',
+          muscle: 'Cadena Posterior',
+          weight: 105,
+          initialWeight: 105,
+          setsReps: '4x6',
+          imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80'
+        },
+        {
+          id: 'row',
+          name: 'Remo con Barra',
+          muscle: 'Espalda & Dorsal',
+          weight: 55,
+          initialWeight: 55,
+          setsReps: '4x10',
+          imageUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80'
+        }
+      ]
+    };
+
+    let state = loadStateFromStorage();
+
+    function loadStateFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(defaultState);
+        const parsed = JSON.parse(raw);
+
+        if (Array.isArray(parsed.exercises)) {
+          const steps = Math.round((parsed.simulatedDays || 0) / 15);
+          parsed.exercises = parsed.exercises.map(ex => {
+            if (ex.id === 'pullups' || (ex.name && ex.name.toLowerCase().includes('dominadas'))) {
+              return {
+                id: 'row',
+                name: 'Remo con Barra',
+                muscle: 'Espalda & Dorsal',
+                weight: 55 + steps * 2.5,
+                initialWeight: 55,
+                setsReps: '4x10',
+                imageUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80'
+              };
+            }
+            return ex;
+          });
+        }
+
+        return {
+          ...structuredClone(defaultState),
+          ...parsed,
+          currentView: 'dashboard',
+          clientFilter: 'todos'
+        };
+      } catch (e) {
+        return structuredClone(defaultState);
+      }
+    }
+
+    function saveStateToStorage() {
+      try {
+        const toSave = {
+          baseMonthlyRevenue: state.baseMonthlyRevenue,
+          simulatedDays: state.simulatedDays,
+          whatsappTemplate: state.whatsappTemplate,
+          lastBackupDate: state.lastBackupDate,
+          clients: state.clients,
+          exercises: state.exercises
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+      } catch (e) {
+        // Ignorar en modo incógnito restringido
+      }
+    }
+
+    function getExerciseFallbackSvg(title) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+        <defs>
+          <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#131924"/>
+            <stop offset="100%" stop-color="#1f2d16"/>
+          </linearGradient>
+        </defs>
+        <rect width="800" height="400" fill="url(#g)"/>
+        <circle cx="650" cy="110" r="160" fill="rgba(163,255,18,0.1)"/>
+        <g stroke="#a3ff12" stroke-width="10" stroke-linecap="round" opacity="0.35">
+          <line x1="540" y1="160" x2="720" y2="160"/>
+          <rect x="520" y="120" width="22" height="80" rx="6" fill="#a3ff12"/>
+          <rect x="718" y="120" width="22" height="80" rx="6" fill="#a3ff12"/>
+        </g>
+      </svg>`;
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    }
+
+    // ====================================================
+    // WHATSAPP AUTOMÁTICO EN 1 CLIC
+    // ====================================================
+    function buildWhatsAppUrl(client) {
+      const template = state.whatsappTemplate || DEFAULT_WPP_TEMPLATE;
+      const message = template
+        .replace(/\{nombre\}/gi, client.name)
+        .replace(/\{plan\}/gi, client.plan)
+        .replace(/\{vencimiento\}/gi, formatDisplayDate(client.dueDate))
+        .replace(/\{monto\}/gi, formatCurrency(client.fee));
+
+      const cleanPhone = (client.phone || '').replace(/\D/g, '');
+      const encodedMsg = encodeURIComponent(message);
+      if (cleanPhone.length >= 8) {
+        return `https://wa.me/${cleanPhone}?text=${encodedMsg}`;
+      }
+      return `https://wa.me/?text=${encodedMsg}`;
+    }
+
+    function sendWhatsAppToClient(clientId) {
+      const client = state.clients.find(c => c.id === clientId);
+      if (!client) return;
+      const url = buildWhatsAppUrl(client);
+      window.open(url, '_blank', 'noopener,noreferrer');
+      showToast(`Abriendo WhatsApp para ${client.name}...`);
+    }
+
+    // ====================================================
+    // NOTIFICACIONES AUTOMÁTICAS EN EL TELÉFONO (SIN BOTONES MANUALES)
+    // ====================================================
+    let lastNotifiedSignature = '';
+    let pushHideTimeout = null;
+
+    function getExpirationAlertSummary() {
+      const expired = state.clients.filter(c => getClientUrgencyState(c) === 'vencido');
+      const soon = state.clients.filter(c => getClientUrgencyState(c) === 'por-vencer');
+      return { expired, soon, totalUrgent: expired.length + soon.length };
+    }
+
+    function triggerPhoneAlertCheck(silentIfUnchanged = false) {
+      const { expired, soon, totalUrgent } = getExpirationAlertSummary();
+      const pushEl = document.getElementById('autoPushNotification');
+
+      if (totalUrgent === 0) {
+        pushEl.classList.remove('show');
+        lastNotifiedSignature = '';
+        return;
+      }
+
+      const currentSignature = [...expired, ...soon].map(c => `${c.id}:${c.dueDate}:${c.status}`).join('|');
+      if (silentIfUnchanged && currentSignature === lastNotifiedSignature) {
+        return;
+      }
+      lastNotifiedSignature = currentSignature;
+
+      const titleText = expired.length > 0 && soon.length > 0
+        ? `⚠️ ${expired.length} cuota(s) vencida(s) y ${soon.length} por vencer`
+        : expired.length > 0
+        ? `🚨 ${expired.length} socio(s) con cuota vencida`
+        : `⏳ ${soon.length} socio(s) próximos a vencer`;
+
+      const namesList = [...expired, ...soon]
+        .slice(0, 3)
+        .map(c => {
+          const diff = getDaysDifference(c.dueDate);
+          return getClientUrgencyState(c) === 'vencido'
+            ? `${c.name} (vencido)`
+            : `${c.name} (vence en ${diff}d)`;
+        })
+        .join(' · ');
+
+      const bodyText = `${namesList}${totalUrgent > 3 ? ` y ${totalUrgent - 3} más` : ''}. Toca esta notificación para cobrar o enviar WhatsApp.`;
+
+      document.getElementById('pushTitleText').textContent = titleText;
+      document.getElementById('pushBodyText').textContent = bodyText;
+
+      // Deslizar automáticamente la notificación en la parte superior de la pantalla del teléfono
+      setTimeout(() => {
+        pushEl.classList.add('show');
+        if (navigator.vibrate) {
+          try { navigator.vibrate([180, 90, 180]); } catch (e) {}
+        }
+      }, 450);
+
+      if (pushHideTimeout) clearTimeout(pushHideTimeout);
+      pushHideTimeout = setTimeout(() => {
+        pushEl.classList.remove('show');
+      }, 8500);
+
+      // Disparar también la notificación nativa del sistema operativo del teléfono automáticamente
+      dispatchNativePhoneNotification(titleText, bodyText);
+    }
+
+    function handlePushClick() {
+      document.getElementById('autoPushNotification').classList.remove('show');
+      switchView('cuotas');
+    }
+
+    function dispatchNativePhoneNotification(title, body) {
+      if (!('Notification' in window)) return;
+
+      if (Notification.permission === 'granted') {
+        sendOSNotification(title, body);
+      } else if (Notification.permission === 'default') {
+        // Solicitar permiso automáticamente al abrir o en el primer toque en pantalla
+        Notification.requestPermission().then(perm => {
+          if (perm === 'granted') {
+            sendOSNotification(title, body);
+          }
+        }).catch(() => {});
+      }
+    }
+
+    function sendOSNotification(title, body) {
+      try {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification(title, {
+              body,
+              vibrate: [200, 100, 200],
+              tag: 'gym-control-auto-cuotas'
+            });
+          });
+        } else {
+          const notif = new Notification(title, { body, tag: 'gym-control-auto-cuotas' });
+          notif.onclick = () => {
+            window.focus();
+            switchView('cuotas');
+          };
+        }
+      } catch (e) {}
+    }
+
+    // ====================================================
+    // INSTALACIÓN DIRECTA EN EL TELÉFONO (PWA)
+    // ====================================================
+    let deferredInstallPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      document.getElementById('installBanner').classList.remove('hidden');
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      document.getElementById('installBanner').classList.add('hidden');
+      showToast('¡Gym Control fue instalado en tu teléfono!');
+    });
+
+    async function handleInstallApp(fromSettings = false) {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        if (outcome === 'accepted') {
+          document.getElementById('installBanner').classList.add('hidden');
+        }
+        deferredInstallPrompt = null;
+        return;
+      }
+
+      // Instrucciones directas según el navegador móvil si se abre directo o en iOS
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        showToast('📲 En iPhone: toca "Compartir" (↑) abajo en Safari y elige "Agregar a inicio".');
+      } else {
+        showToast('📲 En Android/Chrome: toca el menú (⋮) arriba a la derecha y elige "Instalar aplicación" o "Agregar a la pantalla principal".');
+      }
+      if (fromSettings) closeSettingsModal();
+    }
+
+    function dismissInstallBanner() {
+      document.getElementById('installBanner').classList.add('hidden');
+    }
+
+    // ====================================================
+    // COPIAS DE RESPALDO (EXPORTAR E IMPORTAR JSON)
+    // ====================================================
+    function exportBackupJson() {
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0];
+      state.lastBackupDate = formatDisplayDate(dateStr);
+      saveStateToStorage();
+      updateBackupLabel();
+
+      const backupPayload = {
+        app: 'Gym Control',
+        version: 2,
+        exportedAt: now.toISOString(),
+        data: {
+          baseMonthlyRevenue: state.baseMonthlyRevenue,
+          simulatedDays: state.simulatedDays,
+          whatsappTemplate: state.whatsappTemplate,
+          lastBackupDate: state.lastBackupDate,
+          clients: state.clients,
+          exercises: state.exercises
+        }
+      };
+
+      const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gym-control-respaldo-${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      showToast('💾 Copia de respaldo descargada correctamente.');
+    }
+
+    function importBackupJson(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const restoredData = parsed.data || parsed;
+
+          if (!Array.isArray(restoredData.clients)) {
+            showToast('⚠️ El archivo seleccionado no es un respaldo válido de Gym Control.');
+            return;
+          }
+
+          state.clients = restoredData.clients;
+          if (Array.isArray(restoredData.exercises)) state.exercises = restoredData.exercises;
+          if (typeof restoredData.baseMonthlyRevenue === 'number') state.baseMonthlyRevenue = restoredData.baseMonthlyRevenue;
+          if (typeof restoredData.simulatedDays === 'number') state.simulatedDays = restoredData.simulatedDays;
+          if (typeof restoredData.whatsappTemplate === 'string') state.whatsappTemplate = restoredData.whatsappTemplate;
+          state.lastBackupDate = formatDisplayDate(getRelativeDateISO(0));
+
+          saveStateToStorage();
+          renderDashboard();
+          renderClients();
+          renderExercises();
+          triggerPhoneAlertCheck(false);
+          closeSettingsModal();
+          showToast(`✅ ¡Respaldo restaurado! (${state.clients.length} socios recuperados).`);
+        } catch (err) {
+          showToast('⚠️ Error al leer el archivo de respaldo.');
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function updateBackupLabel() {
+      const el = document.getElementById('lastBackupText');
+      if (!el) return;
+      if (state.lastBackupDate) {
+        el.innerHTML = `Última copia descargada: <strong style="color: var(--neon-primary);">${state.lastBackupDate}</strong> · Tus datos también se guardan automáticamente en este dispositivo.`;
+      }
+    }
+
+    // ====================================================
+    // NAVEGACIÓN ENTRE VISTAS
+    // ====================================================
+    function switchView(viewName) {
+      state.currentView = viewName;
+
+      document.querySelectorAll('.view-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      const activeSection = document.getElementById(`view-${viewName}`);
+      if (activeSection) activeSection.classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.target === viewName);
+      });
+
+      const fab = document.getElementById('fabNewMember');
+      if (viewName === 'cuotas') {
+        fab.classList.add('visible');
+      } else {
+        fab.classList.remove('visible');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ====================================================
+    // RENDERIZADO DE VISTA 1: DASHBOARD
+    // ====================================================
+    function renderDashboard() {
+      const expiredClients = state.clients.filter(c => getClientUrgencyState(c) === 'vencido');
+      const soonClients = state.clients.filter(c => getClientUrgencyState(c) === 'por-vencer');
+      const okClients = state.clients.filter(c => getClientUrgencyState(c) === 'al-dia');
+      const totalClients = state.clients.length;
+
+      document.getElementById('kpiRevenue').innerHTML = `<span class="neon-accent">${formatCurrency(state.baseMonthlyRevenue)}</span>`;
+      document.getElementById('kpiTotalMembers').textContent = `${totalClients} Socios totales`;
+      document.getElementById('kpiInactiveCount').textContent = expiredClients.length;
+      document.getElementById('kpiSoonCount').textContent = soonClients.length;
+      document.getElementById('kpiActiveCount').textContent = okClients.length;
+
+      const activeUpToDateCount = okClients.length + soonClients.length;
+      const activePct = totalClients > 0 ? Math.round((activeUpToDateCount / totalClients) * 100) : 0;
+      document.getElementById('kpiRatioFill').style.width = `${activePct}%`;
+
+      updateBackupLabel();
+
+      // Ordenar primero vencidos, luego por vencer, luego al día
+      const sortedUpcoming = [...state.clients]
+        .sort((a, b) => {
+          const rankDiff = getPriorityRank(a) - getPriorityRank(b);
+          if (rankDiff !== 0) return rankDiff;
+          return a.dueDate.localeCompare(b.dueDate);
+        })
+        .slice(0, 5);
+
+      const upcomingContainer = document.getElementById('upcomingList');
+      upcomingContainer.innerHTML = sortedUpcoming.map(client => {
+        const urgency = getClientUrgencyState(client);
+        const diff = getDaysDifference(client.dueDate);
+        let badgeClass = 'ok';
+        let badgeText = `Al día · ${formatDisplayDate(client.dueDate)}`;
+
+        if (urgency === 'vencido') {
+          badgeClass = 'expired';
+          const daysAgo = Math.abs(diff);
+          badgeText = diff < 0 ? `Vencido hace ${daysAgo}d` : 'Vencido';
+        } else if (urgency === 'por-vencer') {
+          badgeClass = 'soon';
+          badgeText = diff === 0 ? 'Vence hoy' : `Por vencer (${diff}d)`;
+        }
+
+        return `
+          <div class="upcoming-item" onclick="switchView('cuotas')" style="cursor: pointer;">
+            <div class="upcoming-left">
+              <div class="avatar status-${urgency}">${getInitials(client.name)}</div>
+              <div class="upcoming-info">
+                <h4>${client.name}</h4>
+                <p>${client.plan} · Vto: ${formatDisplayDate(client.dueDate)}</p>
+              </div>
+            </div>
+            <span class="due-tag ${badgeClass}">${badgeText}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ====================================================
+    // RENDERIZADO DE VISTA 2: CONTROL DE CUOTAS (PRIORIZADO)
+    // ====================================================
+    function setClientFilter(filter) {
+      state.clientFilter = filter;
+      document.querySelectorAll('.filter-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.filter === filter);
+      });
+      renderClients();
+    }
+
+    function renderClients(highlightedClientId = null) {
+      const total = state.clients.length;
+      const expCount = state.clients.filter(c => getClientUrgencyState(c) === 'vencido').length;
+      const soonCount = state.clients.filter(c => getClientUrgencyState(c) === 'por-vencer').length;
+      const okCount = state.clients.filter(c => getClientUrgencyState(c) === 'al-dia').length;
+
+      document.getElementById('countAll').textContent = `(${total})`;
+      document.getElementById('countExpired').textContent = `(${expCount})`;
+      document.getElementById('countSoon').textContent = `(${soonCount})`;
+      document.getElementById('countOk').textContent = `(${okCount})`;
+
+      // Ordenar para que en "Todos" aparezcan: 1° Vencidos, 2° Por vencer y al final 3° Al día
+      const sortedClients = [...state.clients].sort((a, b) => {
+        const rankDiff = getPriorityRank(a) - getPriorityRank(b);
+        if (rankDiff !== 0) return rankDiff;
+        return a.dueDate.localeCompare(b.dueDate);
+      });
+
+      const filtered = sortedClients.filter(client => {
+        const urgency = getClientUrgencyState(client);
+        if (state.clientFilter === 'todos') return true;
+        if (state.clientFilter === 'vencido') return urgency === 'vencido';
+        if (state.clientFilter === 'por-vencer') return urgency === 'por-vencer';
+        if (state.clientFilter === 'al-dia') return urgency === 'al-dia';
+        return true;
+      });
+
+      const listEl = document.getElementById('clientsList');
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align:center; padding: 36px 20px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-subtle); color: var(--text-secondary);">
+            No hay socios en este filtro actualmente.
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(client => {
+        const urgency = getClientUrgencyState(client);
+        const diff = getDaysDifference(client.dueDate);
+        const isVencido = urgency === 'vencido';
+        const isPorVencer = urgency === 'por-vencer';
+
+        let statusLabel = 'Al día';
+        if (isVencido) {
+          statusLabel = 'Vencido';
+        } else if (isPorVencer) {
+          statusLabel = diff === 0 ? 'Vence hoy' : `Por vencer (${diff}d)`;
+        }
+
+        const flashClass = client.id === highlightedClientId ? 'just-updated' : '';
+
+        return `
+          <article class="client-card card-${urgency} ${flashClass}" id="client-card-${client.id}">
+            <div class="client-main">
+              <div class="client-identity">
+                <div class="avatar status-${urgency}" aria-hidden="true">
+                  ${getInitials(client.name)}
+                </div>
+                <div class="client-details">
+                  <div class="client-name">${client.name}</div>
+                  <div class="client-plan">${client.plan}</div>
+                  <div class="client-due">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Vto: <strong style="color: var(--text-primary);">${formatDisplayDate(client.dueDate)}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <span class="status-badge ${urgency}">
+                <span class="status-dot"></span>
+                ${statusLabel}
+              </span>
+            </div>
+
+            <div class="client-actions">
+              <div class="fee-amount">
+                Cuota: <strong>${formatCurrency(client.fee)}</strong>
+              </div>
+
+              <div class="action-buttons-group">
+                ${
+                  isVencido
+                    ? `
+                      <button class="btn-wpp" type="button" onclick="sendWhatsAppToClient(${client.id})" title="Enviar aviso automático por WhatsApp">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                        WhatsApp
+                      </button>
+                      <button class="btn-pay" type="button" onclick="registerPayment(${client.id})">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Registrar Pago
+                      </button>
+                    `
+                    : isPorVencer
+                    ? `
+                      <button class="btn-wpp" type="button" onclick="sendWhatsAppToClient(${client.id})" title="Recordar próximo vencimiento por WhatsApp">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                        Avisar WPP
+                      </button>
+                      <span style="font-size: 0.75rem; color: var(--status-warn); font-weight: 700;">⏳ Próximo a vencer</span>
+                    `
+                    : `<span style="font-size: 0.76rem; color: var(--status-ok); font-weight: 600;">✓ Cuota al día</span>`
+                }
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Acción: Registrar Pago (+30 días y cambio inmediato a "Al día")
+    function registerPayment(clientId) {
+      const client = state.clients.find(c => c.id === clientId);
+      if (!client) return;
+
+      client.status = 'al-dia';
+      client.dueDate = addDaysToISO(client.dueDate, 30);
+      state.baseMonthlyRevenue += client.fee;
+
+      saveStateToStorage();
+      renderClients(clientId);
+      renderDashboard();
+
+      // Si ya no quedan socios vencidos ni por vencer, ocultamos la notificación activa
+      const { totalUrgent } = getExpirationAlertSummary();
+      if (totalUrgent === 0) {
+        document.getElementById('autoPushNotification').classList.remove('show');
+      }
+
+      showToast(`Pago registrado para ${client.name}. Nuevo vencimiento: ${formatDisplayDate(client.dueDate)} (+30 días).`);
+    }
+
+    // ====================================================
+    // MODAL: NUEVO SOCIO (AUTOGESTIÓN)
+    // ====================================================
+    function openNewMemberModal() {
+      const modal = document.getElementById('modalNewMember');
+      document.getElementById('inputMemberDueDate').value = getRelativeDateISO(30);
+      modal.classList.add('open');
+      setTimeout(() => {
+        document.getElementById('inputMemberName').focus();
+      }, 100);
+    }
+
+    function closeNewMemberModal() {
+      document.getElementById('modalNewMember').classList.remove('open');
+      document.getElementById('formNewMember').reset();
+    }
+
+    function handleSaveNewMember(event) {
+      event.preventDefault();
+      const name = document.getElementById('inputMemberName').value.trim();
+      const phone = document.getElementById('inputMemberPhone').value.trim();
+      const plan = document.getElementById('inputMemberPlan').value;
+      const dueDate = document.getElementById('inputMemberDueDate').value;
+
+      if (!name || !plan || !dueDate) return;
+
+      const diffDays = getDaysDifference(dueDate);
+      const initialStatus = diffDays < 0 ? 'vencido' : 'al-dia';
+      const fee = PLAN_PRICES[plan] || 32000;
+
+      const newClient = {
+        id: Date.now(),
+        name,
+        phone,
+        plan,
+        fee,
+        dueDate,
+        status: initialStatus
+      };
+
+      state.clients.unshift(newClient);
+      if (initialStatus === 'al-dia') {
+        state.baseMonthlyRevenue += fee;
+      }
+
+      saveStateToStorage();
+      closeNewMemberModal();
+      state.clientFilter = 'todos';
+      document.querySelectorAll('.filter-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.filter === 'todos');
+      });
+
+      renderClients(newClient.id);
+      renderDashboard();
+      triggerPhoneAlertCheck(true);
+      showToast(`Nuevo socio "${name}" guardado exitosamente.`);
+    }
+
+    // ====================================================
+    // MODALES SEPARADOS: MENSAJE WPP Y CONFIGURACIÓN (RESPALDO)
+    // ====================================================
+    function openWppModal() {
+      const modal = document.getElementById('modalWppTemplate');
+      document.getElementById('inputWppTemplate').value = state.whatsappTemplate || DEFAULT_WPP_TEMPLATE;
+      modal.classList.add('open');
+    }
+
+    function closeWppModal() {
+      document.getElementById('modalWppTemplate').classList.remove('open');
+    }
+
+    function openSettingsModal() {
+      document.getElementById('modalSettings').classList.add('open');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('modalSettings').classList.remove('open');
+    }
+
+    function insertTemplateTag(tag) {
+      const textarea = document.getElementById('inputWppTemplate');
+      const start = textarea.selectionStart || textarea.value.length;
+      const end = textarea.selectionEnd || textarea.value.length;
+      const current = textarea.value;
+      textarea.value = current.slice(0, start) + tag + current.slice(end);
+      textarea.focus();
+    }
+
+    function saveWppTemplate() {
+      const val = document.getElementById('inputWppTemplate').value.trim();
+      if (!val) return;
+      state.whatsappTemplate = val;
+      saveStateToStorage();
+      closeWppModal();
+      showToast('💬 Mensaje automático de WhatsApp actualizado.');
+    }
+
+    function handleBackdropClick(event, modalId) {
+      if (event.target.id === modalId) {
+        document.getElementById(modalId).classList.remove('open');
+      }
+    }
+
+    // ====================================================
+    // RENDERIZADO DE VISTA 3: RUTINAS Y PROGRESIÓN
+    // ====================================================
+    function renderExercises(animateBump = false) {
+      const listEl = document.getElementById('exercisesList');
+      const cycleBadge = document.getElementById('cycleBadge');
+      cycleBadge.textContent = state.simulatedDays === 0 ? 'Día 1 (Base)' : `+${state.simulatedDays} Días`;
+
+      listEl.innerHTML = state.exercises.map(ex => {
+        const gained = ex.weight - ex.initialWeight;
+        const formattedWeight = Number.isInteger(ex.weight) ? ex.weight : ex.weight.toFixed(1);
+        const formattedGain = gained > 0 ? `+${Number.isInteger(gained) ? gained : gained.toFixed(1)} kg ganados` : 'Peso inicial';
+
+        return `
+          <article class="exercise-card ${animateBump ? 'weight-bumped' : ''}">
+            <div class="exercise-media">
+              <img
+                src="${ex.imageUrl}"
+                alt="${ex.name}"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='${getExerciseFallbackSvg(ex.name)}';"
+              />
+              <div class="exercise-overlay">
+                <span class="muscle-tag">${ex.muscle}</span>
+                <div class="exercise-title-wrap">
+                  <h4>${ex.name}</h4>
+                </div>
+              </div>
+            </div>
+            <div class="exercise-body">
+              <div class="metric-group">
+                <div class="metric-pill weight-pill">
+                  <span class="metric-label">Peso Actual</span>
+                  <span class="metric-val">${formattedWeight} kg</span>
+                </div>
+                <div class="metric-pill">
+                  <span class="metric-label">Series / Reps</span>
+                  <span class="metric-val">${ex.setsReps}</span>
+                </div>
+              </div>
+              <span class="delta-badge">${formattedGain}</span>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      if (animateBump) {
+        setTimeout(() => {
+          document.querySelectorAll('.exercise-card').forEach(card => {
+            card.classList.remove('weight-bumped');
+          });
+        }, 900);
+      }
+    }
+
+    function simulateOverload() {
+      state.simulatedDays += 15;
+      state.exercises.forEach(ex => {
+        ex.weight = +(ex.weight + 2.5).toFixed(1);
+      });
+
+      saveStateToStorage();
+      renderExercises(true);
+      showToast(`¡Sobrecarga aplicada (+15 días)! Todos los ejercicios aumentaron +2.5 kg.`);
+    }
+
+    // ====================================================
+    // SISTEMA DE NOTIFICACIONES (TOAST)
+    // ====================================================
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <div class="toast-icon">✓</div>
+        <div>${message}</div>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, 3400);
+    }
+
+    // ====================================================
+    // INICIALIZACIÓN Y REGISTRO DE SERVICE WORKER (PWA)
+    // ====================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDashboard();
+      renderClients();
+      renderExercises();
+
+      // Verificación automática al abrir la app
+      triggerPhoneAlertCheck(false);
+
+      // Verificación automática cuando el usuario desbloquea el teléfono o vuelve a la app
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          triggerPhoneAlertCheck(true);
+        }
+      });
+
+      // Si el navegador móvil requiere un primer toque en pantalla para habilitar notificaciones del sistema operativo, se solicita automáticamente sin botones manuales
+      document.addEventListener('click', () => {
+        if ('Notification' in window && Notification.permission === 'default') {
+          const { totalUrgent } = getExpirationAlertSummary();
+          if (totalUrgent > 0) {
+            Notification.requestPermission().then(perm => {
+              if (perm === 'granted') {
+                lastNotifiedSignature = '';
+                triggerPhoneAlertCheck(false);
+              }
+            }).catch(() => {});
+          }
+        }
+      }, { once: true });
+
+      if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        navigator.serviceWorker.addEventListener('message', event => {
+          if (event.data && event.data.type === 'OPEN_CUOTAS') {
+            switchView('cuotas');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
